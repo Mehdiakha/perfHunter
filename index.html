@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'">
+  <title>Performance Monitor</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app">
+    <header class="titlebar">
+      <div class="titlebar-drag">
+        <svg class="logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/>
+        </svg>
+        <span>Performance Monitor</span>
+      </div>
+      <div class="window-controls">
+        <button class="win-btn" id="minimize" title="Minimize">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14"/>
+          </svg>
+        </button>
+        <button class="win-btn" id="maximize" title="Maximize">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="max-icon">
+            <rect x="4" y="4" width="16" height="16" rx="2"/>
+          </svg>
+        </button>
+        <button class="win-btn win-btn-close" id="close" title="Close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M6 6l12 12M6 18L18 6"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="container">
+      <nav class="sidebar">
+        <button class="nav-btn active" data-view="dashboard" title="Dashboard">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7" rx="1"/>
+            <rect x="14" y="3" width="7" height="7" rx="1"/>
+            <rect x="3" y="14" width="7" height="7" rx="1"/>
+            <rect x="14" y="14" width="7" height="7" rx="1"/>
+          </svg>
+        </button>
+        <button class="nav-btn" data-view="cpu" title="CPU">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="4" y="4" width="16" height="16" rx="2"/>
+            <path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 15h3M1 9h3M1 15h3"/>
+          </svg>
+        </button>
+        <button class="nav-btn" data-view="memory" title="Memory">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="6" width="20" height="12" rx="2"/>
+            <path d="M6 12h.01M10 12h.01M14 12h.01M18 12h.01"/>
+          </svg>
+        </button>
+        <button class="nav-btn" data-view="disk" title="Disk">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <ellipse cx="12" cy="5" rx="9" ry="3"/>
+            <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
+            <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
+          </svg>
+        </button>
+        <button class="nav-btn" data-view="network" title="Network">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12.55a11 11 0 0 1 14.08 0M1.42 9a16 16 0 0 1 21.16 0M8.53 16.11a6 6 0 0 1 6.95 0M12 20h.01"/>
+          </svg>
+        </button>
+        <button class="nav-btn" data-view="processes" title="Processes">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+        </button>
+      </nav>
+
+      <main class="content">
+        <div class="view" id="dashboard-view">
+          <div class="metric-grid">
+            <div class="metric-card" data-view="cpu">
+              <div class="metric-header">
+                <span class="metric-title">CPU</span>
+                <span class="metric-badge" id="cpu-badge">0%</span>
+              </div>
+              <div class="metric-chart">
+                <canvas id="cpu-sparkline"></canvas>
+              </div>
+              <div class="metric-footer">
+                <span id="cpu-freq">0 GHz</span>
+                <span id="cpu-temp" class="temp"></span>
+              </div>
+            </div>
+
+            <div class="metric-card" data-view="memory">
+              <div class="metric-header">
+                <span class="metric-title">Memory</span>
+                <span class="metric-badge memory" id="memory-badge">0%</span>
+              </div>
+              <div class="metric-chart">
+                <canvas id="memory-sparkline"></canvas>
+              </div>
+              <div class="metric-footer">
+                <span id="memory-used">0 / 0 GB</span>
+              </div>
+            </div>
+
+            <div class="metric-card" data-view="disk">
+              <div class="metric-header">
+                <span class="metric-title">Disk</span>
+                <span class="metric-badge disk" id="disk-badge">0%</span>
+              </div>
+              <div class="metric-chart">
+                <canvas id="disk-sparkline"></canvas>
+              </div>
+              <div class="metric-footer">
+                <span id="disk-used">0 / 0 GB</span>
+              </div>
+            </div>
+
+            <div class="metric-card" data-view="network">
+              <div class="metric-header">
+                <span class="metric-title">Network</span>
+                <span class="metric-badge network" id="network-badge">0 KB/s</span>
+              </div>
+              <div class="metric-chart">
+                <canvas id="network-sparkline"></canvas>
+              </div>
+              <div class="metric-footer">
+                <span id="network-total">0 / 0 GB</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="quick-info">
+            <div class="info-item">
+              <span class="info-label">Hostname</span>
+              <span class="info-value" id="hostname">-</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">OS</span>
+              <span class="info-value" id="os-info">-</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Uptime</span>
+              <span class="info-value" id="uptime">-</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="view hidden" id="cpu-view">
+          <div class="detail-header">
+            <h2>CPU Details</h2>
+            <span class="detail-value cpu-text" id="cpu-detail-value">0%</span>
+          </div>
+          <canvas id="cpu-chart" class="detail-chart"></canvas>
+          <div class="detail-stats">
+            <div class="stat-item">
+              <span class="stat-label">Frequency</span>
+              <span class="stat-value" id="cpu-freq-detail">-</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Temperature</span>
+              <span class="stat-value" id="cpu-temp-detail">-</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Cores</span>
+              <span class="stat-value" id="cpu-cores-count">-</span>
+            </div>
+          </div>
+          <div class="cores-grid" id="cores-grid"></div>
+        </div>
+
+        <div class="view hidden" id="memory-view">
+          <div class="detail-header">
+            <h2>Memory Details</h2>
+            <span class="detail-value memory-text" id="memory-detail-value">0%</span>
+          </div>
+          <canvas id="memory-chart" class="detail-chart"></canvas>
+          <div class="memory-bars">
+            <div class="mem-bar-item">
+              <span class="mem-bar-label">Used</span>
+              <div class="mem-bar-track">
+                <div class="mem-bar-fill used" id="mem-bar-used"></div>
+              </div>
+              <span class="mem-bar-value" id="mem-used-value">-</span>
+            </div>
+            <div class="mem-bar-item">
+              <span class="mem-bar-label">Cached</span>
+              <div class="mem-bar-track">
+                <div class="mem-bar-fill cached" id="mem-bar-cached"></div>
+              </div>
+              <span class="mem-bar-value" id="mem-cached-value">-</span>
+            </div>
+            <div class="mem-bar-item">
+              <span class="mem-bar-label">Available</span>
+              <div class="mem-bar-track">
+                <div class="mem-bar-fill available" id="mem-bar-available"></div>
+              </div>
+              <span class="mem-bar-value" id="mem-avail-value">-</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="view hidden" id="disk-view">
+          <div class="detail-header">
+            <h2>Disk Details</h2>
+            <span class="detail-value disk-text" id="disk-detail-value">0%</span>
+          </div>
+          <canvas id="disk-chart" class="detail-chart"></canvas>
+          <div class="disk-list" id="disk-list"></div>
+        </div>
+
+        <div class="view hidden" id="network-view">
+          <div class="detail-header">
+            <h2>Network Details</h2>
+          </div>
+          <canvas id="network-chart" class="detail-chart"></canvas>
+          <div class="network-stats">
+            <div class="net-stat">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#3fb950" stroke-width="2">
+                <path d="M12 19V5M5 12l7-7 7 7"/>
+              </svg>
+              <div>
+                <span class="net-stat-label">Download</span>
+                <span class="net-stat-value" id="net-down-speed">0 KB/s</span>
+              </div>
+            </div>
+            <div class="net-stat">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#f85149" stroke-width="2">
+                <path d="M12 5v14M5 12l7 7 7-7"/>
+              </svg>
+              <div>
+                <span class="net-stat-label">Upload</span>
+                <span class="net-stat-value" id="net-up-speed">0 KB/s</span>
+              </div>
+            </div>
+          </div>
+          <div class="network-total">
+            <div class="total-item">
+              <span>Total Downloaded</span>
+              <span id="net-total-rx">0 GB</span>
+            </div>
+            <div class="total-item">
+              <span>Total Uploaded</span>
+              <span id="net-total-tx">0 GB</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="view hidden" id="processes-view">
+          <div class="detail-header">
+            <h2>Top Processes</h2>
+            <span class="detail-subtitle">By CPU usage</span>
+          </div>
+          <div class="processes-list" id="processes-list"></div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>
