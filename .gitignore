@@ -1,0 +1,11 @@
+node_modules/
+dist/
+*.exe
+*.dll
+*.pak
+*.pdb
+*.blockmap
+*.appx
+*.appxbundle
+*.msix
+*.msixbundle
