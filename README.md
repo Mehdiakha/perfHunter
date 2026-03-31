@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="image.png" width="160"">
+</p>
+
 # Performance Monitor
 
 A simple, interactive Windows performance monitor built with Electron.
@@ -45,41 +49,3 @@ This creates two outputs in the `dist` folder:
 ```bash
 npm run build-dir
 ```
-
-## File Structure
-
-```
-performance-monitor/
-├── main.js          # Main process (system metrics collection)
-├── preload.js       # Secure bridge between main and renderer
-├── index.html       # UI structure
-├── styles.css       # Styling
-├── renderer.js      # UI logic and charts
-├── package.json     # Dependencies and build config
-└── dist/            # Built executables
-```
-
-## How It Works
-
-### Main Process (`main.js`)
-- Runs in Node.js
-- Collects system metrics using `systeminformation`
-- Sends data to renderer via IPC every second
-- Handles window management
-
-### Preload Script (`preload.js`)
-- Security bridge between main and renderer
-- Exposes safe APIs to renderer
-
-### Renderer Process (`renderer.js`)
-- Runs in Chromium (Chrome browser)
-- Updates UI based on received data
-- Draws charts using Canvas API
-- Handles user interactions
-
-## Adding an Icon
-
-1. Create a 256x256 PNG image
-2. Convert to ICO format using an online tool
-3. Name it `icon.ico` and place in project root
-4. Rebuild with `npm run build`
